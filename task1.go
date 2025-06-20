@@ -70,3 +70,27 @@ func isValid(s string) bool {
     }
     return len(stack) == 0
 }
+
+// 4.最长公共前缀
+
+func longestCommonPrefix(strs []string) string {
+	// 首先检查空数组情况
+	if len(strs) == 0 {
+		return ""
+	}
+
+	// 然后以第一个字符串作为初始前缀，依次与其他字符串比较，逐步缩短前缀直到找到最长公共前缀
+	prefix := strs[0]
+	for i := 1; i < len(strs); i++ {
+		for j := 0; j < len(prefix); j++ {
+			if j >= len(strs[i]) || strs[i][j] != prefix[j] {
+				prefix = prefix[:j]
+				break
+			}
+		}
+		if prefix == "" {
+			break
+		}
+	}
+	return prefix
+}
