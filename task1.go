@@ -155,6 +155,7 @@ func twoSum(nums []int, target int) []int {
             if nums[i]+nums[j] == target{
                 re_nums = append(re_nums,i)
                 re_nums = append(re_nums,j)
+		break
             }
         }
     }
