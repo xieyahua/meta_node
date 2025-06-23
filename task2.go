@@ -2,7 +2,21 @@ package main
 
 import "fmt"
 
+// 指针1
+// AddTen 接收整数指针并将值增加10
+func AddTen(numPtr *int) {
+    if numPtr != nil {
+        *numPtr += 10
+    }
+}
 
+func main() {
+    number := 5
+    fmt.Println("原始值:", number)
+    
+    AddTen(&number)
+    fmt.Println("修改后:", number)
+}
 
 // 指针2
 // DoubleSlice 接收切片指针并将每个元素乘以2
