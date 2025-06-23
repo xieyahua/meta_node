@@ -110,3 +110,22 @@ func removeDuplicates(nums []int) int {
     }
     return slow + 1
 }
+
+// 6.给定一个由整数组成的非空数组所表示的非负整数，在该数的基础上加一
+func plusOne(digits []int) []int {
+	n := len(digits)
+	for i := n - 1; i >= 0; i-- {
+		if digits[i] != 9 {
+			digits[i]++
+			// 将该数字之后的所有数字置为 0
+			for j := i + 1; j < n; j++ {
+				digits[j] = 0
+			}
+			return digits
+		}
+	}
+	// 如果所有数字都是 9，则创建一个新的数组
+	result := make([]int, n+1)
+	result[0] = 1
+	return result
+}
