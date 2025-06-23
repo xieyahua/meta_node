@@ -145,3 +145,18 @@ func removeDuplicates(nums []int) int {
     }
     return slow + 1
 }
+
+
+// 8.两数之和
+func twoSum(nums []int, target int) []int {
+    var re_nums []int
+    for i:=0;i<len(nums)-1;i++{
+        for j:=i+1;j<len(nums);j++{
+            if nums[i]+nums[j] == target{
+                re_nums = append(re_nums,i)
+                re_nums = append(re_nums,j)
+            }
+        }
+    }
+    return re_nums
+}
