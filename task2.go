@@ -264,3 +264,45 @@ func main() {
 	// 调用方法输出信息
 	emp.PrintInfo()
 }
+
+
+---------------------------------------------channel 1---------------------------------------------------------------
+
+
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	// 创建无缓冲通道
+	ch := make(chan int)
+	var wg sync.WaitGroup
+
+	// 生产者协程
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 1; i <= 10; i++ {
+			ch <- i // 发送数据到通道
+		}
+		close(ch) // 发送完成后关闭通道
+	}()
+
+	// 消费者协程
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for num := range ch { // 从通道接收数据直到关闭
+			fmt.Printf("接收到: %d\n", num)
+		}
+	}()
+
+	wg.Wait()
+	fmt.Println("通信结束")
+}
+
+---------------------------------------------channel 2---------------------------------------------------------------
+	
