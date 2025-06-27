@@ -342,3 +342,36 @@ func main() {
 	fmt.Println("所有任务完成")
 }
 	
+
+---------------------------------------------锁机制1---------------------------------------------------------------
+
+
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	var (
+		counter int
+		wg      sync.WaitGroup
+		mu      sync.Mutex
+	)
+
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for j := 0; j < 1000; j++ {
+				mu.Lock()
+				counter++
+				mu.Unlock()
+			}
+		}()
+	}
+
+	wg.Wait()
+	fmt.Printf("最终计数器值: %d\n", counter)
+}
