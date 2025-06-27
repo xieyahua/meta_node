@@ -305,4 +305,40 @@ func main() {
 }
 
 ---------------------------------------------channel 2---------------------------------------------------------------
+
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	// 创建缓冲大小为10的通道
+	ch := make(chan int, 10)
+	var wg sync.WaitGroup
+
+	// 生产者协程
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 1; i <= 100; i++ {
+			ch <- i
+			fmt.Printf("生产: %d\n", i)
+		}
+		close(ch) // 发送完成后关闭通道
+	}()
+
+	// 消费者协程
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for num := range ch {
+			fmt.Printf("消费: %d\n", num)
+		}
+	}()
+
+	wg.Wait()
+	fmt.Println("所有任务完成")
+}
 	
