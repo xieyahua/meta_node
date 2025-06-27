@@ -169,3 +169,62 @@ func main() {
 	}
 }
 
+
+
+---------------------------------------------面向对象1---------------------------------------------------------------
+
+package main
+import (
+	"fmt"
+	"math"
+)
+
+// Shape 接口定义
+type Shape interface {
+	Area() float64
+	Perimeter() float64
+}
+
+// Rectangle 矩形结构体
+type Rectangle struct {
+	Width  float64
+	Height float64
+}
+
+// Area 计算矩形面积
+func (r Rectangle) Area() float64 {
+	return r.Width * r.Height
+}
+
+// Perimeter 计算矩形周长
+func (r Rectangle) Perimeter() float64 {
+	return 2 * (r.Width + r.Height)
+}
+
+// Circle 圆形结构体
+type Circle struct {
+	Radius float64
+}
+
+// Area 计算圆形面积
+func (c Circle) Area() float64 {
+	return math.Pi * c.Radius * c.Radius
+}
+
+// Perimeter 计算圆形周长
+func (c Circle) Perimeter() float64 {
+	return 2 * math.Pi * c.Radius
+}
+
+func main() {
+	// 创建矩形实例
+	rect := Rectangle{Width: 5, Height: 3}
+	fmt.Printf("矩形 - 面积: %.2f, 周长: %.2f\n", rect.Area(), rect.Perimeter())
+
+	// 创建圆形实例
+	circle := Circle{Radius: 4}
+	fmt.Printf("圆形 - 面积: %.2f, 周长: %.2f\n", circle.Area(), circle.Perimeter())
+}
+
+
+---------------------------------------------面向对象2---------------------------------------------------------------
