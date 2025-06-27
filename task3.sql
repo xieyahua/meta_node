@@ -22,7 +22,7 @@ BEGIN TRANSACTION;
 
 -- 1. 检查账户A余额是否足够
 DECLARE @balance DECIMAL(18,2);
-SELECT @balance = balance FROM accounts WHERE id = 1; -- 账户A的ID为1
+SELECT @balance = balance FROM accounts WHERE id = A; -- 账户A的ID为1
 
 IF @balance < 100
 BEGIN
@@ -32,14 +32,14 @@ BEGIN
 END
 
 -- 2. 从账户A扣除100元
-UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance - 100 WHERE id = A;
 
 -- 3. 向账户B增加100元
-UPDATE accounts SET balance = balance + 100 WHERE id = 2; -- 账户B的ID为2
+UPDATE accounts SET balance = balance + 100 WHERE id = B; -- 账户B的ID为2
 
 -- 4. 记录交易信息
 INSERT INTO transactions (from_account_id, to_account_id, amount)
-VALUES (1, 2, 100);
+VALUES (A, B, 100);
 
 COMMIT TRANSACTION;
 PRINT '转账成功';
