@@ -228,3 +228,39 @@ func main() {
 
 
 ---------------------------------------------面向对象2---------------------------------------------------------------
+
+package main
+
+import "fmt"
+
+// Person 基础结构体
+type Person struct {
+	Name string
+	Age  int
+}
+
+// Employee 员工结构体，组合Person
+type Employee struct {
+	Person      // 匿名嵌入Person
+	EmployeeID string
+}
+
+// PrintInfo 打印员工信息
+func (e Employee) PrintInfo() {
+	fmt.Printf("员工ID: %s\n姓名: %s\n年龄: %d\n", 
+		e.EmployeeID, e.Name, e.Age)
+}
+
+func main() {
+	// 创建Employee实例
+	emp := Employee{
+		Person: Person{
+			Name: "张三",
+			Age:  28,
+		},
+		EmployeeID: "E1001",
+	}
+
+	// 调用方法输出信息
+	emp.PrintInfo()
+}
