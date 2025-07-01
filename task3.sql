@@ -47,7 +47,7 @@ PRINT '转账成功';
 
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- 使用SQL扩展库进行查询
+-- 题目1：使用SQL扩展库进行查询
 package main
 
 import (
@@ -101,4 +101,44 @@ func main() {
 	fmt.Printf("%+v\n", topSalaryEmployee)
 }
 
+
+-- 题目2：实现类型安全映射
+
+package main
+
+import (
+	"fmt"
+	"log"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
+)
+
+type Book struct {
+	ID     int     `db:"id"`
+	Title  string  `db:"title"`
+	Author string  `db:"author"`
+	Price  float64 `db:"price"`
+}
+
+func main() {
+	db, err := sqlx.Connect("mysql", "root:lucaxie123456@tcp(localhost:3306)/test")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	var expensiveBooks []Book
+	err = db.Select(&expensiveBooks,
+		"SELECT id, title, author, price FROM books WHERE price > ?", 50.0)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("价格大于50元的书籍：")
+	for _, book := range expensiveBooks {
+		fmt.Printf("ID: %d, 书名: %s, 作者: %s, 价格: %.2f\n",
+			book.ID, book.Title, book.Author, book.Price)
+	}
+}
 
