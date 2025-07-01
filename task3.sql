@@ -43,3 +43,62 @@ VALUES (A, B, 100);
 
 COMMIT TRANSACTION;
 PRINT '转账成功';
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- 使用SQL扩展库进行查询
+package main
+
+import (
+	"fmt"
+	"log"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
+)
+
+// 定义Employee结构体映射表字段
+type Employee struct {
+	ID         int    `db:"id"`
+	Name       string `db:"name"`
+	Department string `db:"department"`
+	Salary     int    `db:"salary"`
+}
+
+func main() {
+	// 假设已建立数据库连接
+	db, err := sqlx.Connect("mysql", "root:lucaxie123456@tcp(localhost:3306)/test")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	// 查询技术部员工
+	var techEmployees []Employee
+	err = db.Select(&techEmployees,
+		"SELECT id, name, department, salary FROM employees WHERE department = ?", "技术部")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 打印结果
+
+	fmt.Println("技术部员工：")
+	for _, emp := range techEmployees {
+		fmt.Printf("ID: %d, Name: %s, Department: %s, Salary: %d\n",
+			emp.ID, emp.Name, emp.Department, emp.Salary)
+	}
+
+	// 查询工资最高员工
+	var topSalaryEmployee Employee
+	err = db.Get(&topSalaryEmployee,
+		"SELECT * FROM employees ORDER BY salary DESC LIMIT 1")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("\n工资最高员工：")
+	fmt.Printf("%+v\n", topSalaryEmployee)
+}
+
+
