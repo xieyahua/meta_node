@@ -142,3 +142,51 @@ func main() {
 	}
 }
 
+
+
+
+----------------------------------------------进阶gorm------------------------------------------------------------------------------------------------------------------------
+-- 题目1：模型定义
+package main
+
+import (
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+
+type User struct {
+	gorm.Model
+	Username string `gorm:"unique;not null"`
+	Email    string `gorm:"unique;not null"`
+	Password string `gorm:"not null"`
+	Posts    []Post `gorm:"foreignKey:UserID"`
+}
+
+type Post struct {
+	gorm.Model
+	Title    string    `gorm:"not null"`
+	Content  string    `gorm:"type:text"`
+	UserID   uint      `gorm:"not null"`
+	Comments []Comment `gorm:"foreignKey:PostID"`
+}
+
+type Comment struct {
+	gorm.Model
+	Content string `gorm:"type:text"`
+	PostID  uint   `gorm:"not null"`
+	UserID  uint   `gorm:"not null"`
+}
+
+func main() {
+	dsn := "root:lucaxie123456@tcp(localhost:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	// 自动迁移创建表
+	err = db.AutoMigrate(&User{}, &Post{}, &Comment{})
+	if err != nil {
+		panic("failed to migrate database")
+	}
+}
