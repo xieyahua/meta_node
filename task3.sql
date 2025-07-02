@@ -190,3 +190,88 @@ func main() {
 		panic("failed to migrate database")
 	}
 }
+
+
+-- 题目2：关联查询-------------------
+package main
+
+import (
+	"fmt"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+
+type User struct {
+	gorm.Model
+	Username string `gorm:"size:50;unique;not null"`
+	Email    string `gorm:"size:100;unique;not null"`
+	Password string `gorm:"size:255;not null"`
+	Posts    []Post // 一对多关系：用户拥有多篇文章
+}
+
+type Post struct {
+	gorm.Model
+	Title    string    `gorm:"size:100;not null"`
+	Content  string    `gorm:"type:text;not null"`
+	UserID   uint      // 外键
+	User     User      // 反向引用
+	Comments []Comment // 一对多关系：文章拥有多条评论
+}
+
+type Comment struct {
+	gorm.Model
+	Content string `gorm:"type:text;not null"`
+	UserID  uint   // 评论作者ID
+	PostID  uint   // 外键
+	Post    Post   // 反向引用
+}
+
+// 查询用户所有文章及评论
+func GetUserPostsWithComments(db *gorm.DB, userID uint) ([]Post, error) {
+	var posts []Post
+	err := db.Preload("Comments").
+		Where("user_id = ?", userID).
+		Find(&posts).Error
+	return posts, err
+}
+
+// 查询评论最多的文章
+func GetMostCommentedPost(db *gorm.DB) (Post, error) {
+	var post Post
+	err := db.Model(&Post{}).
+		Select("posts.*, COUNT(comments.id) as comment_count").
+		Joins("LEFT JOIN comments ON comments.post_id = posts.id").
+		Group("posts.id").
+		Order("comment_count DESC").
+		First(&post).Error
+	return post, err
+}
+
+func main() {
+	dsn := "root:lucaxie123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("数据库连接失败")
+	}
+
+	// 示例1：查询用户1的所有文章及评论
+	posts, err := GetUserPostsWithComments(db, 1)
+	if err != nil {
+		fmt.Println("查询失败:", err)
+	} else {
+		fmt.Printf("用户1的文章数量: %d\n", len(posts))
+		for _, post := range posts {
+			fmt.Printf("文章《%s》有%d条评论\n", post.Title, len(post.Comments))
+		}
+	}
+
+	// 示例2：查询评论最多的文章
+	mostCommented, err := GetMostCommentedPost(db)
+	if err != nil {
+		fmt.Println("查询失败:", err)
+	} else {
+		fmt.Printf("评论最多的文章是《%s》\n", mostCommented.Title)
+	}
+}
+
