@@ -275,3 +275,58 @@ func main() {
 	}
 }
 
+
+
+-- 题目3：钩子函数---------------------------------
+
+package models
+
+import "gorm.io/gorm"
+
+type User struct {
+	gorm.Model
+	Name     string
+	Email    string `gorm:"unique"`
+	Password string
+	Posts    []Post // 一对多关系：用户拥有多篇文章
+}
+
+type Post struct {
+	gorm.Model
+	Title    string
+	Content  string
+	UserID   uint      // 外键，关联用户
+	User     User      // 属于用户
+	Comments []Comment // 一对多关系：文章拥有多条评论
+}
+
+type Comment struct {
+	gorm.Model
+	Content string
+	PostID  uint // 外键，关联文章
+	Post    Post // 属于文章
+	UserID  uint // 外键，关联评论者
+	User    User // 属于评论者
+}
+
+func (p *Post) AfterCreate(tx *gorm.DB) (err error) {
+	return tx.Model(&User{}).Where("id = ?", p.UserID).
+		UpdateColumn("post_count", gorm.Expr("post_count + 1")).Error
+}
+
+func (c *Comment) AfterDelete(tx *gorm.DB) (err error) {
+	var count int64
+	if err := tx.Model(&Comment{}).
+		Where("post_id = ?", c.PostID).
+		Count(&count).Error; err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return tx.Model(&Post{}).
+			Where("id = ?", c.PostID).
+			Update("comment_status", "无评论").Error
+	}
+	return nil
+}
+
